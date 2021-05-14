@@ -38,7 +38,7 @@ parser = argparse.ArgumentParser(
     """
     MakeTrain.py
 
-    Creates a reference matrix to use for NNLS with regions as defined by the user. Takes NGS, Infinium HM450K and methylationEPIC as input.
+    Creates a reference matrix to use for NNLS or CelFIE with regions as defined by the user. Takes bismark coverage files, Infinium HM450K and methylationEPIC as input.
 
     Example:
     MakeTrain.py -n /folder/NBL,/folder/cfDNA -a NBL,cfDNA -r regions.tsv -o reference.txt
@@ -429,7 +429,7 @@ elif (type == "celfie" | type == "celfie_individ_cpg"):
             move_column_inplace(a, "stop", 2)
             a.sort_values(by=["chr","start","stop"], inplace=True)
             a = a.fillna(np.NaN)
-            a.to_csv(trainFileName + ".tsv.gz", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            a.to_csv(trainFileName + "_celfie.tsv.gz", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
         else:
             # Make sure that the file contains all the clusters
             trainFile = pd.merge(clusters, trainFile, how = "left", left_index=True, right_index=True)

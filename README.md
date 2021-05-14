@@ -20,16 +20,20 @@ conda install --file requirements.txt
 
 Making the reference matrix:
 ```
-python makeTrain.py -n ./classifySamples/train/examples/NGS/NBL/,./classifySamples/train/examples/NGS/cfDNA -a NBL,cfDNA -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test.txt
+python makeTrain.py -n ./classifySamples/train/examples/NGS/NBL/,./classifySamples/train/examples/NGS/cfDNA \
+                    -a NBL,cfDNA \
+                    -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv \
+                    -o test.txt
 ```
 
 Making the sample matrix:
 ```
-python makeTest.py -f ./classifySamples/testfiles/examples/ -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -c 30 -p outtest
+python makeTest.py -f ./classifySamples/testfiles/examples/ \
+                    -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv \
+                    -c 30 -p outtest
 ```
 
-Running the deconvolution
-
+Running the deconvolution:
 ```
 python runMeth_atlas.py -a ./classifySamples/resources/20190323_test_beta_plasma_MANUSCRIPT.gz \
                         -b ./classifySamples/resources/train_plasma_WGBS_as_normal_MANUSCRIPT.gz \

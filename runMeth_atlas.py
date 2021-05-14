@@ -15,15 +15,16 @@ parser = argparse.ArgumentParser(
     runMeth_atlas.py
 
     Runs metatlas on a testmatrix and reference matrix.
+    Files will be written to ./classifySamples/output/classification
 
     Example:
     MakeTest.py -a /folder/test -b /folder/ref -p outprefix -n cfDNA,WBC
     """)
 
-parser.add_argument('-a', '--test', default = None, required=True)
-parser.add_argument('-b', '--reference', default = None, required=True)
-parser.add_argument('-n', '--normal', default = None, action=SplitArgs)
-parser.add_argument('-p', '--outprefix', default = None)
+parser.add_argument('-a', '--test', help = "prefix + beta.txt.gz from makeTest.py", default = None, required=True)
+parser.add_argument('-b', '--reference',  help = "output from makeTrain.py", default = None, required=True)
+parser.add_argument('-n', '--normal', help = "comma-separated list of labels of the normal tissues in the reference dataset to exclude from tumor assignment e.g. cfdna,wbc", default = None, action=SplitArgs)
+parser.add_argument('-p', '--outprefix', help = "prefix for output files", default = None, required = True)
 args = parser.parse_args()
 
 inputFile_samples = args.test

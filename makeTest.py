@@ -20,6 +20,9 @@ class SplitArgs(argparse.Action):
 tempdir = (tempfile.TemporaryDirectory())
 tmp_folder = os.path.join(tempdir.name) + '/'
 
+if not os.path.exists("./classifySamples/output/"):
+    os.makedirs("./classifySamples/output/")
+
 # testargs
 #folder = "./classifySamples/testfiles/examples/"
 #regions = "./classifySamples/resources/RRBS_450k_intersectClusters.tsv"
@@ -32,18 +35,22 @@ parser = argparse.ArgumentParser(
     """
     MakeTest.py
 
-    Creates a testmatrix to use for NNLS with regions as defined by the user. Takes Bismark coverage files as input.
-
+    Creates a testmatrix to use for NNLS with regions as defined by the user. Takes bismark coverage files as input.
+    Outputs three files in the folder ./classifySamples/output/:
+        1. prefix + "_depth.tsv.gz" = contains the total depth per region, per sample
+        2. prefix + "_methy.tsv.gz" = contains the number of methylated reads per region, per sample
+        3. prefix + "_beta.tsv.gz" = contains beta value per region, per sample.
+    
     Example:
     MakeTest.py -n /folder/ -r regions.tsv -o testmatrix.txt
     """)
 
-parser.add_argument('-f', '--folder', default = None, required=True)
+parser.add_argument('-f', '--folder', help = "folder containg bismark cov.gz files that will be added to the test matrix.", default = None, required=True)
 
-parser.add_argument('-r', '--regions', default = None, required=True)
-parser.add_argument('-c', '--cutoff', default = 30)
+parser.add_argument('-r', '--regions', default = None, required=True, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID. Should be identical to the reference dataset from makeTrain.py.")
+parser.add_argument('-c', '--cutoff', default = 30, help = "all clusters with reads below this threshold will be marked as NA.")
 
-parser.add_argument('-p', '--outprefix', default = None)
+parser.add_argument('-p', '--outprefix', default = None, help = "prefix for the depth, methy and beta file.")
 args = parser.parse_args()
 
 folder = args.folder
@@ -52,8 +59,8 @@ cutoff = int(args.cutoff)
 prefix = args.outprefix
 
 print("""Running makeTest.py
-            - Bismark coverage folder: %s
-                Files found: %s
+            - bismark coverage folder: %s
+                files found: %s
             - Regions: %s
             - Cutoff: %i
             - output: %s

@@ -44,22 +44,23 @@ parser = argparse.ArgumentParser(
     MakeTrain.py -n /folder/NBL,/folder/cfDNA -a NBL,cfDNA -r regions.tsv -o reference.txt
     """)
 
-parser.add_argument('-n', '--ngsfolder', default = None, action=SplitArgs)
-parser.add_argument('-a', '--ngslabels', default = None, action=SplitArgs)
+parser.add_argument('-n', '--ngsfolder', help = "comma-separated list of location of the folder that contains bismark coverage files in cov.gz format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All cov.gz files in this folder will be added to the reference dataset.", 
+                    default = None, action=SplitArgs)
+parser.add_argument('-a', '--ngslabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
-parser.add_argument('-i', '--infiniumfolder', default = None, action=SplitArgs)
-parser.add_argument('-b', '--infiniumlabels', default = None, action=SplitArgs)
+parser.add_argument('-i', '--infiniumfolder', help = "comma-separated list of location of the folder that contains HM450K files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
+parser.add_argument('-b', '--infiniumlabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
-parser.add_argument('-e', '--epicfolder', default = None, action=SplitArgs)
-parser.add_argument('-d', '--epiclabels', default = None, action=SplitArgs)
+parser.add_argument('-e', '--epicfolder', help = "comma-separated list of location of the folder that contains MethylationEPIC files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
+parser.add_argument('-d', '--epiclabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
-parser.add_argument('-r', '--regions', default = None)
-parser.add_argument('-c', '--cutoff', default = 30)
+parser.add_argument('-r', '--regions', required = True, default = None, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID")
+parser.add_argument('-c', '--cutoff', default = 30, help = "all clusters with reads below this threshold will be marked as NA.")
 
-parser.add_argument('-y', '--infiannot', default = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
-parser.add_argument('-z', '--epicannot', default = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
+parser.add_argument('-y', '--infiannot', required = True, help = "annotation file of HM450K in csv.gz format, see Illuina website.", default = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
+parser.add_argument('-z', '--epicannot', required = True, help = "annotation file of MethylationEPIC in csv.gz format, see Illumina website.", default = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
 
-parser.add_argument('-o', '--output', default = None)
+parser.add_argument('-o', '--output', required = True, help = "reference matrix will be saved as this file", default = None)
 args = parser.parse_args()
 
 ngsfolder = args.ngsfolder

@@ -2,6 +2,7 @@
 ## Import libraries
 import glob
 import os
+import tempfile
 import numpy as np
 import pandas as pd
 import subprocess
@@ -15,6 +16,9 @@ class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values.split(','))
 
+# Folder to store intermediate files
+tempdir = (tempfile.TemporaryDirectory())
+tmp_folder = os.path.join(tempdir.name)
 # testargs
 #ngsfolder = ["/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA"]
 #ngslabels = ["NBL","cfDNA"]
@@ -86,18 +90,17 @@ print("""Running makeTrain.py
             - Cutoff: %i
             - HM450K annotation file: %s
             - MethylationEPIC annotation file: %s
-            - output: %s
+            - output: %s,
+            - temp directory: %s
     """ % (ngsfolder,ngslabels,
             infiniumfolder, infiniumlabels,
             epicfolder, epiclabels,
             regions, cutoff,
             infiannot, epicannot,
-            trainFileName))
+            trainFileName, tmp_folder))
 #%%
-# Folder to store intermediate files
-tmp_folder = "/tmp/"
-clusters = cfRRBS.import_clusters(regions)[0]
-clusterFile = cfRRBS.import_clusters(regions)[1]
+clusters = cfRRBS.import_clusters(regions, tmp_folder)[0]
+clusterFile = cfRRBS.import_clusters(regions, tmp_folder)[1]
 array450k = cfRRBS.import_450k(infiannot)
 array850k = cfRRBS.import_450k(epicannot)
 
@@ -306,5 +309,7 @@ with Manager() as manager:
     print("The number of rows in the %s is: %i" %  (regions,clusters.shape[0])) 
     print("The number of columns in the %s file is: %i" %  (trainFileName,trainFile.shape[1]))
     print("The number of columns in the %s file after removing all NA values is: %i" %  (trainFileName,trainFile_rmNA.shape[1]))
-    
+
+print("Cleaning up temporary directory...")
+tempdir.cleanup()
 # %%

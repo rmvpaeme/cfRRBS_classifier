@@ -3,14 +3,12 @@ import pandas as pd
 import os
 # Folder to store intermediate files
 
-tmp_folder = "/tmp/"
-
-def import_clusters(regions):
+def import_clusters(regions, tempdir):
     # The file containing the features (= the intersect between HM450K data and RRBS data, see GitHub README)
     clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2], skiprows=[0], header=None, index_col=None)
     clusters[3] = clusters.index
     clusterFile = str(os.path.splitext(os.path.basename(regions))[0]) + "_tmp"
-    clusters.to_csv(tmp_folder + "%s.txt" % clusterFile, header=None, index=None, sep='\t', mode = 'w')
+    clusters.to_csv(tempdir + "%s.txt" % clusterFile, header=None, index=None, sep='\t', mode = 'w')
     clusters = clusters.drop([0,1,2,3], axis = 1) # Use empty index to later extract all the clusters from, so that every sample has the same number of clusters
     return clusters,str(clusterFile)
 

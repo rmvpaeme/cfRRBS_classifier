@@ -2,6 +2,7 @@
 ## Import libraries
 import glob
 import os
+import tempfile
 import numpy as np
 import pandas as pd
 import subprocess
@@ -14,6 +15,10 @@ cpuCount = (multiprocess.cpu_count() - 2)
 class SplitArgs(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values.split(','))
+
+# Folder to store intermediate files
+tempdir = (tempfile.TemporaryDirectory())
+tmp_folder = os.path.join(tempdir.name) + '/'
 
 # testargs
 #folder = "./classifySamples/testfiles"
@@ -52,22 +57,17 @@ print("""Running makeTest.py
             - Regions: %s
             - Cutoff: %i
             - output: %s
-    """ % (folder, glob.glob(os.path.join(folder, "*.cov.gz")), regions, cutoff, prefix))
+            - temp directory: %s
+    """ % (folder, glob.glob(os.path.join(folder, "*.cov.gz")), regions, cutoff, prefix, tmp_folder))
 
 #%%
-# Folder to store intermediate files
-tmp_folder = "/tmp/"
-
-clusters = cfRRBS.import_clusters(regions)[0]
-clusterFile = cfRRBS.import_clusters(regions)[1]
+clusters = cfRRBS.import_clusters(regions, tmp_folder)[0]
+clusterFile = cfRRBS.import_clusters(regions, tmp_folder)[1]
 
 # Name of output
 testMethyName = prefix + "_methy"
 testDepthName = prefix + "_depth"
 testBetaName = prefix + "_beta"
-
-# Folder to store intermediate files
-tmp_folder = "/tmp/"
 
 ## The location of the cfRRBS files, after running the preprocessing pipeline
 test_files = glob.glob(os.path.join(folder, "*.cov.gz"))
@@ -171,4 +171,6 @@ with Manager() as manager:
     print("The number of columns in the %s file is: %i" % (testMethyName,testMethy.shape[1]))
     print("The number of columns in the %s file is: %i" % (testDepthName,testDepth.shape[1]))
 
+print("Cleaning up temporary directory...")
+tempdir.cleanup()
 # %%

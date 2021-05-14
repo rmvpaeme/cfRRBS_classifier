@@ -21,11 +21,11 @@ tempdir = (tempfile.TemporaryDirectory())
 tmp_folder = os.path.join(tempdir.name) + '/'
 
 # testargs
-#folder = "./classifySamples/testfiles"
+#folder = "./classifySamples/testfiles/examples/"
 #regions = "./classifySamples/resources/RRBS_450k_intersectClusters.tsv"
 #prefix = "testscript"
 #cutoff = 30
-
+#python makeTest.py -f ./classifySamples/testfiles/examples/ -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -c 30 -p outtest
 #%%
 
 parser = argparse.ArgumentParser(
@@ -48,7 +48,7 @@ args = parser.parse_args()
 
 folder = args.folder
 regions = args.regions
-cutoff = args.cutoff
+cutoff = int(args.cutoff)
 prefix = args.outprefix
 
 print("""Running makeTest.py

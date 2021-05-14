@@ -75,7 +75,7 @@ regions = args.regions
 infiannot = args.infiannot
 epicannot = args.epicannot
 
-cutoff = args.cutoff
+cutoff = int(args.cutoff)
 
 trainFileName = args.output
 

@@ -27,3 +27,12 @@ Making the sample matrix:
 ```
 python makeTest.py -f ./classifySamples/testfiles/examples/ -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -c 30 -p outtest
 ```
+
+Running the deconvolution
+
+```
+python runMeth_atlas.py -a ./classifySamples/resources/20190323_test_beta_plasma_MANUSCRIPT.gz \
+                        -b ./classifySamples/resources/train_plasma_WGBS_as_normal_MANUSCRIPT.gz \
+                        -n normal,wbc \
+                        -p examplerun
+```

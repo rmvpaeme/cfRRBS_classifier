@@ -5,7 +5,7 @@ from scipy import optimize
 import argparse
 import os.path as op
 import sys
-from multiprocessing import Pool
+from multiprocess import Pool
 import math
 import matplotlib.pylab as plt
 import matplotlib.cm

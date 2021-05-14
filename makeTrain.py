@@ -31,7 +31,7 @@ tmp_folder = os.path.join(tempdir.name)
 #epicannot = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv"
 #output = "./testscript.tsv"
 
-#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test.txt
+#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test
 #%%
 
 parser = argparse.ArgumentParser(
@@ -304,7 +304,7 @@ with Manager() as manager:
     # Make sure that the file contains all the clusters
     trainFile = pd.merge(clusters, trainFile, how = "left", left_index=True, right_index=True)
     trainFile = trainFile.transpose().fillna('NA')
-    trainFile.to_csv(trainFileName, header=None, sep='\t', mode = 'w')
+    trainFile.to_csv(trainFileName + ".tsv.gz", header=None, sep='\t', mode = 'w', compression = "gzip")
     trainFile_rmNA = trainFile.select_dtypes(include=['float64'])
     print("The number of rows in the %s is: %i" %  (regions,clusters.shape[0])) 
     print("The number of columns in the %s file is: %i" %  (trainFileName,trainFile.shape[1]))

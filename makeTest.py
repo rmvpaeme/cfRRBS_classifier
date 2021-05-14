@@ -65,9 +65,9 @@ clusters = cfRRBS.import_clusters(regions, tmp_folder)[0]
 clusterFile = cfRRBS.import_clusters(regions, tmp_folder)[1]
 
 # Name of output
-testMethyName = prefix + "_methy"
-testDepthName = prefix + "_depth"
-testBetaName = prefix + "_beta"
+testMethyName = prefix + "_methy.tsv.gz"
+testDepthName = prefix + "_depth.tsv.gz"
+testBetaName = prefix + "_beta.tsv.gz"
 
 ## The location of the cfRRBS files, after running the preprocessing pipeline
 test_files = glob.glob(os.path.join(folder, "*.cov.gz"))
@@ -151,19 +151,19 @@ with Manager() as manager:
     testMethy = pd.concat(testMethy_list, axis = 1)
     testMethy = pd.merge(clusters, testMethy, how = "left", left_index=True, right_index=True)    # Merge the pandas df with the clusters, leaving NA values for clusters that were not covered.
     testMethy = testMethy.transpose().fillna('NA')   # Transpose and Fill NaN with NA string
-    testMethy.to_csv("./classifySamples/output/%s" % testMethyName, header=None,sep='\t', mode = 'w')
+    testMethy.to_csv("./classifySamples/output/%s" % testMethyName, header=None,sep='\t', mode = 'w', compression="gzip")
 
     print("Merging all %s in one file..." % testDepthName)
     testDepth = pd.concat(testDepth_list, axis = 1)
     testDepth = pd.merge(clusters, testDepth, how = "left", left_index=True, right_index=True)
     testDepth = testDepth.transpose().fillna('NA')
-    testDepth.to_csv("./classifySamples/output/%s" % testDepthName, header=None,sep='\t', mode = 'w')
+    testDepth.to_csv("./classifySamples/output/%s" % testDepthName, header=None,sep='\t', mode = 'w', compression="gzip")
 
     testBeta = pd.concat(testBeta_list, axis = 1)
     testBeta = pd.merge(clusters, testBeta, how = "left", left_index=True, right_index=True)
     testBeta = testBeta.transpose().fillna('NA')
     print("Writing to disk...")
-    testBeta.to_csv("./classifySamples/output/%s" % testBetaName, header=None,sep='\t', mode = 'w')
+    testBeta.to_csv("./classifySamples/output/%s" % testBetaName, header=None,sep='\t', mode = 'w', compression="gzip")
 
     testMethy_rmNA = testMethy.apply(pd.to_numeric, errors='coerce').dropna(axis=1)
     testDepth_rmNA = testDepth.apply(pd.to_numeric, errors='coerce').dropna(axis=1)

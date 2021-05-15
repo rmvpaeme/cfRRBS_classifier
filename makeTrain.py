@@ -30,8 +30,7 @@ tmp_folder = os.path.join(tempdir.name)
 #infiannot = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz"
 #epicannot = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz"
 #output = "./testscript.tsv"
-
-#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test
+#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test -t methatlas
 #%%
 
 parser = argparse.ArgumentParser(
@@ -39,10 +38,11 @@ parser = argparse.ArgumentParser(
     MakeTrain.py
 
     Creates a reference matrix to use for NNLS or CelFIE with regions as defined by the user. Takes bismark coverage files, Infinium HM450K and methylationEPIC as input.
+    Saves the reference matrix in ./classifySamples/output/ folder.
 
     Example:
     MakeTrain.py -n /folder/NBL,/folder/cfDNA -a NBL,cfDNA -r regions.tsv -o reference.txt
-    """)
+    """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-n', '--ngsfolder', help = "comma-separated list of location of the folder that contains bismark coverage files in cov.gz format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All cov.gz files in this folder will be added to the reference dataset.", 
                     default = None, action=SplitArgs)
@@ -57,12 +57,12 @@ parser.add_argument('-d', '--epiclabels', help = "comma-separated list of labels
 parser.add_argument('-r', '--regions', required = True, default = None, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID")
 parser.add_argument('-c', '--cutoff', default = 30, help = "all clusters with reads below this threshold will be marked as NA.")
 
-parser.add_argument('-y', '--infiannot', required = True, help = "annotation file of HM450K in csv.gz format, see Illuina website.", default = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
-parser.add_argument('-z', '--epicannot', required = True, help = "annotation file of MethylationEPIC in csv.gz format, see Illumina website.", default = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
+parser.add_argument('-y', '--infiannot', help = "annotation file of HM450K in csv.gz format, see Illuina website.", default = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
+parser.add_argument('-z', '--epicannot', help = "annotation file of MethylationEPIC in csv.gz format, see Illumina website.", default = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
 
-parser.add_argument('-t', '--type', choices=['celfie', "celfie_individ_cpg", 'methatlas'], required = True, help = "make reference for celfie or meth_atlas (=NNLS). Celfie only supports bismark coverage files.", default = "methatlas")
+parser.add_argument('-t', '--type', choices=['celfie', "celfie_individ_cpg", 'methatlas'], required = True, help = "Make reference for celfie or meth_atlas (=NNLS). Celfie only supports bismark coverage files. Default = 'methatlas'.", default = "methatlas")
 
-parser.add_argument('-o', '--output', required = True, help = "reference matrix will be saved as this file", default = None)
+parser.add_argument('-o', '--output', required = True, help = "the reference matrix will be saved as this file in ./classifySamples/output/", default = None)
 args = parser.parse_args()
 
 ngsfolder = args.ngsfolder
@@ -81,6 +81,11 @@ epicannot = args.epicannot
 cutoff = int(args.cutoff)
 
 trainFileName = args.output
+
+if not os.path.exists("./classifySamples/output/"):
+    os.makedirs("./classifySamples/output/")
+
+trainFileName = "./classifySamples/output/" + trainFileName
 
 type = args.type
 
@@ -281,7 +286,7 @@ def generateTrain_celfie(inputfile, label, file_name):
 
         return df
 #%%
-if type == "meth_atlas":
+if type == "methatlas":
     with Manager() as manager:
         #Define empty list
         trainFile_list = manager.list()
@@ -380,7 +385,7 @@ if type == "meth_atlas":
         print("The number of columns in the %s file is: %i" %  (trainFileName,trainFile.shape[1]))
         print("The number of columns in the %s file after removing all NA values is: %i" %  (trainFileName,trainFile_rmNA.shape[1]))
 
-elif (type == "celfie" | type == "celfie_individ_cpg"):
+elif (type == "celfie" or type == "celfie_individ_cpg"):
     with Manager() as manager:
         #Define empty list
         trainFile_list = manager.list()
@@ -438,4 +443,4 @@ elif (type == "celfie" | type == "celfie_individ_cpg"):
 
 print("Cleaning up temporary directory...")
 tempdir.cleanup()
-# %%
+print("Done.")# %%

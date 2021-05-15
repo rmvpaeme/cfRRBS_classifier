@@ -19,7 +19,7 @@ parser = argparse.ArgumentParser(
 
     Example:
     MakeTest.py -a /folder/test -b /folder/ref -p outprefix -n cfDNA,WBC
-    """)
+    """,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-a', '--test', help = "prefix + beta.txt.gz from makeTest.py", default = None, required=True)
 parser.add_argument('-b', '--reference',  help = "output from makeTrain.py", default = None, required=True)
@@ -40,7 +40,7 @@ prefix = args.outprefix
 #inputFile_samples = "./classifySamples/resources/20190323_test_beta_plasma_MANUSCRIPT.gz"
 #prefix = "test"
 #normal = "normal"
-#python runMeth_atlas.py -a ./classifySamples/resources/20190323_test_beta_plasma_MANUSCRIPT.gz -b ./classifySamples/resources/train_plasma_WGBS_as_normal_MANUSCRIPT.gz -n normal -p examplerun
+#python runMeth_atlas.py -a ./classifySamples/resources/20190323_test_beta_plasma_MANUSCRIPT.gz -b ./classifySamples/resources/train_plasma_WGBS_as_normal_MANUSCRIPT.gz -n normal,wbc -p examplerun
 #%%
 outputFile_atlas = prefix + "_train_methatlas.csv"
 outputFile_samples = prefix + "_test_methatlas.csv"
@@ -57,8 +57,8 @@ print("""
                 saving collapsed reference matrix as %s/%s
             - test matrix: %s
                 saving reformated test matrix as %s/%s
-            - full deconvolution results available at %s/%s
-            - tumor prediction available at %s/%s (removal of %s)
+            - full deconvolution results will be saved to %s/%s
+            - tumor prediction will be saved to %s/%s (highest fraction after removal of %s)
         """ % (inputFile_tumor_atlas, outDir, outputFile_atlas, 
                 inputFile_samples, outDir,outputFile_samples,
                 outDir,outputFile_samples.split('.')[0] + "_deconv_output.csv",
@@ -105,3 +105,5 @@ results_tumor = results_tumor.rename(columns={0: "Classification", 1: "Tumor bur
 results_tumor = results_tumor.replace(np.nan, 0)
 results_tumor = results_tumor.sort_index()
 results_tumor.to_csv("%s/%s" % (outDir,classificationResults), header=True, index = True, sep=',', mode = 'w')
+
+print("Done.")

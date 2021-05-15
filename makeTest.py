@@ -43,9 +43,9 @@ parser = argparse.ArgumentParser(
     
     Example:
     MakeTest.py -n /folder/ -r regions.tsv -o testmatrix.txt
-    """)
+    """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-parser.add_argument('-f', '--folder', help = "folder containg bismark cov.gz files that will be added to the test matrix.", default = None, required=True)
+parser.add_argument('-f', '--folder', help = "folder containg bismark cov.gz files that will be added to the test matrix. Automatically detects all .cov.gz files.", default = None, required=True)
 
 parser.add_argument('-r', '--regions', default = None, required=True, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID. Should be identical to the reference dataset from makeTrain.py.")
 parser.add_argument('-c', '--cutoff', default = 30, help = "all clusters with reads below this threshold will be marked as NA.")
@@ -57,6 +57,9 @@ folder = args.folder
 regions = args.regions
 cutoff = int(args.cutoff)
 prefix = args.outprefix
+
+if not os.path.exists("./classifySamples/output/"):
+    os.makedirs("./classifySamples/output/")
 
 print("""Running makeTest.py
             - bismark coverage folder: %s
@@ -180,4 +183,5 @@ with Manager() as manager:
 
 print("Cleaning up temporary directory...")
 tempdir.cleanup()
+print("Done.")
 # %%

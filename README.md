@@ -46,7 +46,7 @@ wget -q -O tmp.zip https://webdata.illumina.com/downloads/productfiles/methylati
 $ python makeTrain.py -n ./classifySamples/train/examples/NGS/NBL/,./classifySamples/train/examples/NGS/cfDNA \
                     -a NBL,cfDNA \
                     -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv \
-                    -o test.txt -t meth_atlas
+                    -o test.txt -t methatlas
 
 # make the test matrix
 $ python makeTest.py -f ./classifySamples/testfiles/examples/ \

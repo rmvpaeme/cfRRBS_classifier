@@ -111,8 +111,10 @@ print("""Running makeTrain.py for %s
 #%%
 clusters = cfRRBS.import_clusters(regions, tmp_folder)[0]
 clusterFile = cfRRBS.import_clusters(regions, tmp_folder)[1]
-array450k = cfRRBS.import_450k(infiannot)
-array850k = cfRRBS.import_450k(epicannot)
+if infiniumfolder is not None:  
+    array450k = cfRRBS.import_450k(infiannot)
+if epicfolder is not None:
+    array850k = cfRRBS.import_450k(epicannot)
 
 
 #%%

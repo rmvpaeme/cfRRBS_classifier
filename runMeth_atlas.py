@@ -24,12 +24,14 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-a', '--test', help = "prefix + beta.txt.gz from makeTest.py", default = None, required=True)
 parser.add_argument('-b', '--reference',  help = "output from makeTrain.py", default = None, required=True)
 parser.add_argument('-n', '--normal', help = "comma-separated list of labels of the normal tissues in the reference dataset to exclude from tumor assignment e.g. cfdna,wbc", default = None, action=SplitArgs)
+parser.add_argument('-c', '--collapse', help = "collapse replicate columns with mean or median", default = "median", required = True, choices=['mean', "median"])
 parser.add_argument('-p', '--outprefix', help = "prefix for output files", default = None, required = True)
 args = parser.parse_args()
 
 inputFile_samples = args.test
 inputFile_tumor_atlas = args.reference
 normal = args.normal
+collapse = args.collapse
 prefix = args.outprefix
 
 ## Set the working directory
@@ -55,11 +57,13 @@ print("""
         Running deconvolution with NNLS (meth_atlas)...
             - reference matrix: %s
                 saving collapsed reference matrix as %s/%s
+                replicates will be collapse with the %s
             - test matrix: %s
                 saving reformated test matrix as %s/%s
             - full deconvolution results will be saved to %s/%s
             - tumor prediction will be saved to %s/%s (highest fraction after removal of %s)
         """ % (inputFile_tumor_atlas, outDir, outputFile_atlas, 
+                collapse,
                 inputFile_samples, outDir,outputFile_samples,
                 outDir,outputFile_samples.split('.')[0] + "_deconv_output.csv",
                 outDir,classificationResults,
@@ -70,7 +74,10 @@ df_tumor = df_tumor.transpose()
 df_tumor.columns = df_tumor.iloc[0]
 df_tumor = df_tumor.reindex(df_tumor.index.drop(0))
 df_tumor = df_tumor.astype('float64')
-df_tumor = df_tumor.groupby(by=df_tumor.columns, axis=1).median()
+if collapse == "median":
+    df_tumor = df_tumor.groupby(by=df_tumor.columns, axis=1).median()
+elif collapse == "mean":
+    df_tumor = df_tumor.groupby(by=df_tumor.columns, axis=1).mean()
 df_tumor['IlmnID'] = df_tumor.index
 df_tumor['IlmnID'] = 'cg' + df_tumor['IlmnID'].astype(str)
 df_tumor = df_tumor.set_index("IlmnID")

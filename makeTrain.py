@@ -10,6 +10,7 @@ import argparse
 import multiprocess
 from multiprocess import Manager, Pool
 import imports_cfRRBS_classifier as cfRRBS
+import csv  
 cpuCount = (multiprocess.cpu_count() - 2)
 
 class SplitArgs(argparse.Action):
@@ -442,7 +443,10 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
             trainFile = pd.merge(clusters, trainFile, how = "left", left_index=True, right_index=True)
             trainFile_rmNA = trainFile.dropna(axis = 0)
             trainFile_rmNA.to_csv(trainFileName + "_celfie.tsv.gz", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
-
+            ngslabels.append("unknown")
+            with open(trainFileName + '_celfie_samplekey.tsv', 'w', newline='') as f_output:
+                tsv_output = csv.writer(f_output, delimiter='\t')
+                tsv_output.writerow(ngslabels)
 print("Cleaning up temporary directory...")
 tempdir.cleanup()
 print("Done.")# %%

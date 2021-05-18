@@ -110,8 +110,8 @@ print("""Running makeTrain.py for %s
             infiannot, epicannot,
             trainFileName, tmp_folder))
 #%%
-clusters = cfRRBS.import_clusters(regions, tmp_folder)[0]
-clusterFile = cfRRBS.import_clusters(regions, tmp_folder)[1]
+clusters = cfRRBS.import_clusters(regions, tmp_folder, type = type)[0]
+clusterFile = cfRRBS.import_clusters(regions, tmp_folder, type = type)[1]
 if infiniumfolder is not None:  
     array450k = cfRRBS.import_450k(infiannot)
 if epicfolder is not None:
@@ -437,12 +437,18 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
             move_column_inplace(a, "stop", 2)
             a.sort_values(by=["chr","start","stop"], inplace=True)
             a = a.fillna(np.NaN)
-            a.to_csv(trainFileName + "_celfie.tsv.gz", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            a.to_csv(trainFileName + "_celfie.tsv", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            a.iloc[:, 0:3].to_csv(trainFileName + "_celfie.sites", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            ngslabels.append("unknown")
+            with open(trainFileName + '_celfie_samplekey.tsv', 'w', newline='') as f_output:
+                tsv_output = csv.writer(f_output, delimiter='\t')
+                tsv_output.writerow(ngslabels)
         else:
             # Make sure that the file contains all the clusters
             trainFile = pd.merge(clusters, trainFile, how = "left", left_index=True, right_index=True)
             trainFile_rmNA = trainFile.dropna(axis = 0)
-            trainFile_rmNA.to_csv(trainFileName + "_celfie.tsv.gz", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            trainFile_rmNA.to_csv(trainFileName + "_celfie.tsv", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            trainFile_rmNA.iloc[:, 0:3].to_csv(trainFileName + "_celfie.sites", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
             ngslabels.append("unknown")
             with open(trainFileName + '_celfie_samplekey.tsv', 'w', newline='') as f_output:
                 tsv_output = csv.writer(f_output, delimiter='\t')

@@ -62,7 +62,8 @@ classificationResults = prefix + "_classificationResults_methAtlas.csv"
 
 print("""
         Running deconvolution with NNLS (meth_atlas)...
-            - feature selection: %s with the top %i hyper/hypomethylated regions
+            - feature selection: %s 
+                selecting the top %i hyper/hypomethylated regions
             - reference matrix: %s
                 %s will be excluded
                 saving collapsed reference matrix as %s/%s

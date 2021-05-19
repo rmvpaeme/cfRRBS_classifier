@@ -24,8 +24,12 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-a', '--test', help = "prefix + beta.txt.gz from makeTest.py", default = None, required=True)
 parser.add_argument('-b', '--reference',  help = "output from makeTrain.py", default = None, required=True)
 parser.add_argument('-n', '--normal', help = "comma-separated list of labels of the normal tissues in the reference dataset to exclude from tumor assignment e.g. cfdna,wbc", default = None, action=SplitArgs)
-parser.add_argument('-c', '--collapse', help = "collapse replicate columns with mean or median", default = "median", required = True, choices=['mean', "median"])
+parser.add_argument('-x', '--exclude', help = "comma-separated list with tumor entities to exclude from the reference dataset", default = None, action=SplitArgs)
+parser.add_argument('-c', '--collapse', help = "collapse replicate columns with mean or median", default = "median", required = False, choices=['mean', "median"])
 parser.add_argument('-p', '--outprefix', help = "prefix for output files", default = None, required = True)
+parser.add_argument('-f', '--fs', help = "enable feature selection by selecting the top n hyper and hypomethylated regions per entity", action='store_true', required = False)
+parser.add_argument('-m', '--mrc', help = "top n hyper and hypomethylated regions will be selected with feature selection", default=100, required = False)
+
 args = parser.parse_args()
 
 inputFile_samples = args.test
@@ -33,6 +37,9 @@ inputFile_tumor_atlas = args.reference
 normal = args.normal
 collapse = args.collapse
 prefix = args.outprefix
+feature_selection = args.fs
+exclude = args.exclude
+mrc = int(args.mrc)
 
 ## Set the working directory
 #os.chdir('/Users/rmvpaeme/Repos/cfRRBS_paper/code/')
@@ -55,14 +62,17 @@ classificationResults = prefix + "_classificationResults_methAtlas.csv"
 
 print("""
         Running deconvolution with NNLS (meth_atlas)...
+            - feature selection: %s with the top %i hyper/hypomethylated regions
             - reference matrix: %s
+                %s will be excluded
                 saving collapsed reference matrix as %s/%s
-                replicates will be collapse with the %s
+                replicates will be collapse with the %s method
             - test matrix: %s
                 saving reformated test matrix as %s/%s
             - full deconvolution results will be saved to %s/%s
             - tumor prediction will be saved to %s/%s (highest fraction after removal of %s)
-        """ % (inputFile_tumor_atlas, outDir, outputFile_atlas, 
+        """ % (feature_selection, mrc,
+                inputFile_tumor_atlas, exclude, outDir, outputFile_atlas, 
                 collapse,
                 inputFile_samples, outDir,outputFile_samples,
                 outDir,outputFile_samples.split('.')[0] + "_deconv_output.csv",
@@ -81,6 +91,23 @@ elif collapse == "mean":
 df_tumor['IlmnID'] = df_tumor.index
 df_tumor['IlmnID'] = 'cg' + df_tumor['IlmnID'].astype(str)
 df_tumor = df_tumor.set_index("IlmnID")
+df_tumor = df_tumor.drop(exclude, axis = 1) # confounding entities
+
+if feature_selection == True:
+    topup = (df_tumor.div(df_tumor.sum(axis=1), axis=0))
+    markers_list = []
+    for column in topup:
+        markers_df = topup[[column]].sort_values(by=column, ascending = False).head(mrc)
+        markers_list.append(list(markers_df.index.map(str)))
+    topdown = ((1-df_tumor).div((1-df_tumor).sum(axis=1), axis=0))
+    for column in topdown:
+        markers_df = topdown[[column]].sort_values(by=column, ascending = False).head(mrc)
+        markers_list.append(list(markers_df.index.map(str)))
+    markers_list = list(set([item for sublist in markers_list for item in sublist]))
+    markers_df = pd.DataFrame(markers_list)
+    markers_df.columns = ["IlmnID"]
+    markers_df = markers_df.set_index("IlmnID")
+    df_tumor = pd.merge(df_tumor, markers_df, left_index=True, right_index=True, how='right')
 
 df_tumor.to_csv("%s/%s" % (outDir,outputFile_atlas), header=True, index = True, sep=',', mode = 'w')
 # df_tumor = pd.read_csv("./train_methatlas_plasma_manuscript.csv", sep=",", header = 0, index_col = 0) # uncomment this to reproduce the manuscript results

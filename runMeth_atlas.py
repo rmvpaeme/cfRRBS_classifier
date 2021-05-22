@@ -18,7 +18,7 @@ parser = argparse.ArgumentParser(
     Files will be written to ./classifySamples/output/classification
 
     Example:
-    MakeTest.py -a /folder/test -b /folder/ref -p outprefix -n cfDNA,WBC
+    runMeth_atlas.py -a /folder/test -b /folder/ref -p outprefix -n cfDNA,WBC
     """,formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-a', '--test', help = "prefix + beta.txt.gz from makeTest.py", default = None, required=True)

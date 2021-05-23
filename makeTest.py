@@ -42,7 +42,7 @@ parser = argparse.ArgumentParser(
         3. prefix + "_beta.tsv.gz" = contains beta value per region, per sample.
     
     Example:
-    MakeTest.py -n /folder/ -r regions.tsv -o testmatrix.txt
+    python makeTest.py -f ./folder/ -r RRBS_450k_intersectClusters.tsv -c 30 -p test
     """, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 parser.add_argument('-f', '--folder', help = "folder containg bismark cov.gz files that will be added to the test matrix. Automatically detects all .cov.gz files.", default = None, required=True)

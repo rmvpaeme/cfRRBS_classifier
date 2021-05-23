@@ -14,7 +14,8 @@ def import_clusters(regions, tempdir, type = "methatlas"):
     clusterFile = str(os.path.splitext(os.path.basename(regions))[0]) + "_tmp"
     clusters.to_csv(tempdir + "%s.txt" % clusterFile, header=None, index=None, sep='\t', mode = 'w')
     if (type == "celfie" or type == "celfie_individ_cpg"):
-        clusters = clusters.drop([3], axis = 1) # Use empty index to later extract all the clusters from, so that every sample has the same number of clusters
+        clusters = clusters.drop([3], axis = 1)
+        clusters.columns = ["CHROM", "START", "END"] # Use empty index to later extract all the clusters from, so that every sample has the same number of clusters
     else:
         clusters = clusters.drop([0,1,2,3], axis = 1) # Use empty index to later extract all the clusters from, so that every sample has the same number of clusters
     return clusters,str(clusterFile)

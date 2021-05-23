@@ -280,7 +280,7 @@ def generateTrain_celfie(inputfile, label, file_name):
         df[7] = df[4] + df[5]         # Get total depth
 
         df[[7,6,4,5]] = df[[7,6,4,5]].mask(df[7] < 30)         # Mark all clusters lower than 30 reads with NA
-
+        
         df = df.drop([0,1,2,5,6], axis = 1)
 
         os.remove(tmp_folder + '%s_intersect.txt' % file_name)
@@ -392,12 +392,12 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
     with Manager() as manager:
         #Define empty list
         trainFile_list = manager.list()
-
+        #trainFile_list = []
         if ngsfolder is not None:
             ngsindex = 0
             for folder in ngsfolder:
                 tumorGroup_list =  manager.list()
-               # tumorGroup_list = 
+               # tumorGroup_list =  []
                 files = glob.glob(os.path.join(str(folder), "*.gz"))  
                 labels = ngslabels[ngsindex]
 
@@ -420,6 +420,7 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
                 tumorGroup[8] = tumorGroup[4].mean(axis= 1)
                 tumorGroup[9] = tumorGroup[7].mean(axis= 1)
                 tumorGroup = tumorGroup.drop([4,7], axis = 1)
+                tumorGroup.columns = [labels + "_METH", labels + "_DEPTH"]
                 trainFile_list.append(tumorGroup)
 
         # Generate full matrix from list
@@ -438,7 +439,7 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
             a.sort_values(by=["chr","start","stop"], inplace=True)
             a = a.fillna(np.NaN)
             a.to_csv(trainFileName + "_celfie.tsv", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
-            a.iloc[:, 0:3].to_csv(trainFileName + "_celfie.sites", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            a.iloc[:, 0:3].to_csv(trainFileName + "_celfie.sites", header=True, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
             ngslabels.append("unknown")
             with open(trainFileName + '_celfie_samplekey.tsv', 'w', newline='') as f_output:
                 tsv_output = csv.writer(f_output, delimiter='\t')
@@ -447,12 +448,15 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
             # Make sure that the file contains all the clusters
             trainFile = pd.merge(clusters, trainFile, how = "left", left_index=True, right_index=True)
             trainFile_rmNA = trainFile.dropna(axis = 0)
-            trainFile_rmNA.to_csv(trainFileName + "_celfie.tsv", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
-            trainFile_rmNA.iloc[:, 0:3].to_csv(trainFileName + "_celfie.sites", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
             ngslabels.append("unknown")
             with open(trainFileName + '_celfie_samplekey.tsv', 'w', newline='') as f_output:
                 tsv_output = csv.writer(f_output, delimiter='\t')
                 tsv_output.writerow(ngslabels)
+            trainFile_rmNA.to_csv(trainFileName + "_celfie.tsv", header=True, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+            trainFile_rmNA.iloc[:, 0:3].to_csv(trainFileName + "_celfie.sites", header=None, sep='\t', mode = 'w', index = False, na_rep = np.NaN)
+
 print("Cleaning up temporary directory...")
 tempdir.cleanup()
 print("Done.")# %%
+
+# %%

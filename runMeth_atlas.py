@@ -23,8 +23,8 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-a', '--test', help = "prefix + beta.txt.gz from makeTest.py", default = None, required=True)
 parser.add_argument('-b', '--reference',  help = "output from makeTrain.py", default = None, required=True)
-parser.add_argument('-n', '--normal', help = "comma-separated list of labels of the normal tissues in the reference dataset to exclude from tumor assignment e.g. cfdna,wbc", default = None, action=SplitArgs)
-parser.add_argument('-x', '--exclude', help = "comma-separated list with tumor entities to exclude from the reference dataset", default = None, action=SplitArgs)
+parser.add_argument('-n', '--normal', help = "comma-separated list of labels of the normal tissues in the reference dataset to exclude from tumor assignment (after the deconvolution step) e.g. cfdna,wbc", default = None, action=SplitArgs)
+parser.add_argument('-x', '--exclude', help = "comma-separated list with tumor entities to exclude from the reference dataset (before the deconvolution step)", default = None, action=SplitArgs)
 parser.add_argument('-c', '--collapse', help = "collapse replicate columns with mean or median", default = "median", required = False, choices=['mean', "median"])
 parser.add_argument('-p', '--outprefix', help = "prefix for output files", default = None, required = True)
 parser.add_argument('-f', '--fs', help = "enable feature selection by selecting the top n hyper and hypomethylated regions per entity", action='store_true', required = False)

@@ -71,7 +71,7 @@ print("""
                 saving reformated test matrix as %s/%s
             - full deconvolution results will be saved to %s/%s
             - tumor prediction will be saved to %s/%s (highest fraction after removal of %s)
-        """ % (feature_selection, mrc,
+        """ % (feature_selection,
                 inputFile_tumor_atlas, exclude, outDir, outputFile_atlas, 
                 collapse,
                 inputFile_samples, outDir,outputFile_samples,

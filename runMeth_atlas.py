@@ -63,7 +63,6 @@ classificationResults = prefix + "_classificationResults_methAtlas.csv"
 print("""
         Running deconvolution with NNLS (meth_atlas)...
             - feature selection: %s 
-                selecting the top %i hyper/hypomethylated regions
             - reference matrix: %s
                 %s will be excluded
                 saving collapsed reference matrix as %s/%s
@@ -128,7 +127,8 @@ df_samples.to_csv("%s/%s" % (outDir,outputFile_samples), header=True, index = Tr
 deconvolve_resids.Deconvolve(atlas_path="%s/%s" % (outDir,outputFile_atlas),samp_path="%s/%s" % (outDir,outputFile_samples),out_dir=outDir,plot=False,resid=True).run()
 
 results = pd.read_csv("%s/%s" % (outDir,outputFile_samples.split('.')[0] + "_deconv_output.csv"), sep=",", header = 0, index_col = 0)
-results = results.drop(normal)
+if normal is not None:
+    results = results.drop(normal)
 results = results.replace(0, np.nan)
 results.sort_values(by=list(results.columns.values), inplace=True)
 

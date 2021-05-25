@@ -91,7 +91,8 @@ elif collapse == "mean":
 df_tumor['IlmnID'] = df_tumor.index
 df_tumor['IlmnID'] = 'cg' + df_tumor['IlmnID'].astype(str)
 df_tumor = df_tumor.set_index("IlmnID")
-df_tumor = df_tumor.drop(exclude, axis = 1) # confounding entities
+if exclude is not None:
+    df_tumor = df_tumor.drop(exclude, axis = 1) # confounding entities
 
 if feature_selection == True:
     topup = (df_tumor.div(df_tumor.sum(axis=1), axis=0))

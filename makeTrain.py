@@ -8,6 +8,7 @@ import pandas as pd
 import subprocess
 import argparse
 import multiprocess
+import sys
 from multiprocess import Manager, Pool
 import imports_cfRRBS_classifier as cfRRBS
 import csv  
@@ -31,7 +32,7 @@ tmp_folder = os.path.join(tempdir.name)
 #infiannot = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz"
 #epicannot = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz"
 #output = "./testscript.tsv"
-#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test -t methatlas
+#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA  -i /Users/rmvpaeme/Repos/cfRRBS_classifier_v0.2/classifySamples/train/infinium/EWS/ -b EWS -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test -t methatlas
 #%%
 
 parser = argparse.ArgumentParser(
@@ -49,17 +50,19 @@ parser.add_argument('-n', '--ngsfolder', help = "comma-separated list of locatio
                     default = None, action=SplitArgs)
 parser.add_argument('-a', '--ngslabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
-parser.add_argument('-i', '--infiniumfolder', help = "comma-separated list of location of the folder that contains HM450K files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
+parser.add_argument('-i', '--infiniumfolder', help = "comma-separated list of location of the folder that contains HM450K files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be headerless, tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
 parser.add_argument('-b', '--infiniumlabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
-parser.add_argument('-e', '--epicfolder', help = "comma-separated list of location of the folder that contains MethylationEPIC files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
+parser.add_argument('-e', '--epicfolder', help = "comma-separated list of location of the folder that contains MethylationEPIC files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be headerless, tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
 parser.add_argument('-d', '--epiclabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
 parser.add_argument('-r', '--regions', required = True, default = None, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID")
 parser.add_argument('-c', '--cutoff', default = 30, help = "all clusters with reads below this threshold will be marked as NA.")
 
-parser.add_argument('-y', '--infiannot', help = "annotation file of HM450K in csv.gz format, see Illuina website.", default = dirname + "/classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
-parser.add_argument('-z', '--epicannot', help = "annotation file of MethylationEPIC in csv.gz format, see Illumina website.", default = dirname + "/classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
+parser.add_argument('-y', '--infiannot', help = "annotation file of HM450K in csv.gz format, see README and Illuina website.", default = dirname + "/classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
+parser.add_argument('-z', '--epicannot', help = "annotation file of MethylationEPIC in csv.gz format, see README and Illumina website.", default = dirname + "/classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
+
+parser.add_argument('--annotbuild', choices = ['hg19', 'hg38'], help = "Reference genome for the HM450K/EPIC annotation files.", default = "hg19")
 
 parser.add_argument('-t', '--type', choices=['celfie', "celfie_individ_cpg", 'methatlas'], required = True, help = "Make reference for celfie or meth_atlas (=NNLS). Celfie only supports bismark coverage files. Default = 'methatlas'.", default = "methatlas")
 
@@ -78,6 +81,8 @@ epiclabels = args.epiclabels
 regions = args.regions
 infiannot = args.infiannot
 epicannot = args.epicannot
+
+annotbuild = str(args.annotbuild)
 
 cutoff = int(args.cutoff)
 
@@ -113,9 +118,9 @@ print("""Running makeTrain.py for %s
 clusters = cfRRBS.import_clusters(regions, tmp_folder, type = type)[0]
 clusterFile = cfRRBS.import_clusters(regions, tmp_folder, type = type)[1]
 if infiniumfolder is not None:  
-    array450k = cfRRBS.import_450k(infiannot)
+    array450k = cfRRBS.import_450k(infiannot, annotbuild)
 if epicfolder is not None:
-    array850k = cfRRBS.import_450k(epicannot)
+    array850k = cfRRBS.import_850k(epicannot, annotbuild)
 
 
 #%%
@@ -308,7 +313,10 @@ if type == "methatlas":
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain bismark coverage files... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files gzipped and ending in *cov.gz?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
                 pool = Pool(cpuCount)
                 pool.map(import_NGS_train, files)
@@ -329,16 +337,19 @@ if type == "methatlas":
                     ## Add the chromosomal position to the sample
                     df = pd.merge(array450k, df, how = "inner", left_index=True, right_index=True)
                     ## Add a stop and reorder the columns
-                    df["MAPINFO_Stop"] = df["MAPINFO"]
+                    df["MAPINFO_Stop"] = (df["MAPINFO"].astype(int) + 2).astype(str) # MAPINFO is 0-based, this conforms to bed format
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
-                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w')
+                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w', na_rep='NA')
 
                     df = generateTrain_Infinium(label = labels, file_name = file_name)
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain Infinium HM450K files (tab separated with cg and beta value)... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files ending in *txt?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
 
                 pool = Pool(cpuCount)
@@ -360,16 +371,19 @@ if type == "methatlas":
                     ## Add the chromosomal position to the sample
                     df = pd.merge(array850k, df, how = "inner", left_index=True, right_index=True)
                     ## Add a stop and reorder the columns
-                    df["MAPINFO_Stop"] = df["MAPINFO"]
+                    df["MAPINFO_Stop"] = (df["MAPINFO"].astype(int) + 2).astype(str)# MAPINFO is 0-based, this conforms to bed format
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
-                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w')
+                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w', na_rep='NA')
 
                     df = generateTrain_Infinium(label = labels, file_name = file_name)
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain Infinium HumanMethylationEPIC files (tab separated with cg and beta value)... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files ending in *txt?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
 
                 pool = Pool(cpuCount)
@@ -408,7 +422,10 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
                     tumorGroup_list.append(df)
                 
                 print("Running on %s which should contain bismark coverage files... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files gzipped and ending in *cov.gz?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
 
                 pool = Pool(cpuCount)

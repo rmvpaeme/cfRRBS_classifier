@@ -50,10 +50,10 @@ parser.add_argument('-n', '--ngsfolder', help = "comma-separated list of locatio
                     default = None, action=SplitArgs)
 parser.add_argument('-a', '--ngslabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
-parser.add_argument('-i', '--infiniumfolder', help = "comma-separated list of location of the folder that contains HM450K files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
+parser.add_argument('-i', '--infiniumfolder', help = "comma-separated list of location of the folder that contains HM450K files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be headerless, tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
 parser.add_argument('-b', '--infiniumlabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
-parser.add_argument('-e', '--epicfolder', help = "comma-separated list of location of the folder that contains MethylationEPIC files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
+parser.add_argument('-e', '--epicfolder', help = "comma-separated list of location of the folder that contains MethylationEPIC files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be headerless, tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
 parser.add_argument('-d', '--epiclabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
 
 parser.add_argument('-r', '--regions', required = True, default = None, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID")
@@ -340,7 +340,7 @@ if type == "methatlas":
                     df["MAPINFO_Stop"] = (df["MAPINFO"].astype(int) + 2).astype(str) # MAPINFO is 0-based, this conforms to bed format
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
-                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w')
+                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w', na_rep='NA')
 
                     df = generateTrain_Infinium(label = labels, file_name = file_name)
                     trainFile_list.append(df)
@@ -374,7 +374,7 @@ if type == "methatlas":
                     df["MAPINFO_Stop"] = (df["MAPINFO"].astype(int) + 2).astype(str)# MAPINFO is 0-based, this conforms to bed format
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
-                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w')
+                    df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w', na_rep='NA')
 
                     df = generateTrain_Infinium(label = labels, file_name = file_name)
                     trainFile_list.append(df)

@@ -31,7 +31,7 @@ tmp_folder = os.path.join(tempdir.name)
 #infiannot = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz"
 #epicannot = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz"
 #output = "./testscript.tsv"
-#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test -t methatlas
+#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA  -i /Users/rmvpaeme/Repos/cfRRBS_classifier_v0.2/classifySamples/train/infinium/EWS/ -b EWS -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test -t methatlas
 #%%
 
 parser = argparse.ArgumentParser(
@@ -117,9 +117,9 @@ print("""Running makeTrain.py for %s
 clusters = cfRRBS.import_clusters(regions, tmp_folder, type = type)[0]
 clusterFile = cfRRBS.import_clusters(regions, tmp_folder, type = type)[1]
 if infiniumfolder is not None:  
-    array450k = cfRRBS.import_450k(infiannot)
+    array450k = cfRRBS.import_450k(infiannot, annotbuild)
 if epicfolder is not None:
-    array850k = cfRRBS.import_450k(epicannot)
+    array850k = cfRRBS.import_450k(epicannot, annotbuild)
 
 
 #%%

@@ -119,7 +119,7 @@ clusterFile = cfRRBS.import_clusters(regions, tmp_folder, type = type)[1]
 if infiniumfolder is not None:  
     array450k = cfRRBS.import_450k(infiannot, annotbuild)
 if epicfolder is not None:
-    array850k = cfRRBS.import_450k(epicannot, annotbuild)
+    array850k = cfRRBS.import_850k(epicannot, annotbuild)
 
 
 #%%

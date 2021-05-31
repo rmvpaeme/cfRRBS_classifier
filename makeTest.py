@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import subprocess
 import argparse
+import sys
 import multiprocess
 from multiprocess import Manager, Pool
 import imports_cfRRBS_classifier as cfRRBS
@@ -61,6 +62,10 @@ prefix = args.outprefix
 if not os.path.exists("./classifySamples/output/"):
     os.makedirs("./classifySamples/output/")
 
+if len(glob.glob(os.path.join(folder, "*.cov.gz"))) == 0:
+    sys.exit("ERROR! No files found (are the files gzipped and ending in *cov.gz?)")
+
+
 print("""Running makeTest.py
             - bismark coverage folder: %s
                 files found: %s
@@ -81,6 +86,8 @@ testBetaName = prefix + "_beta.tsv.gz"
 
 ## The location of the cfRRBS files, after running the preprocessing pipeline
 test_files = glob.glob(os.path.join(folder, "*.cov.gz"))
+
+
 
 #%%
 def import_test_files(x):

@@ -8,6 +8,7 @@ import pandas as pd
 import subprocess
 import argparse
 import multiprocess
+import sys
 from multiprocess import Manager, Pool
 import imports_cfRRBS_classifier as cfRRBS
 import csv  
@@ -312,7 +313,10 @@ if type == "methatlas":
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain bismark coverage files... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files gzipped and ending in *cov.gz?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
                 pool = Pool(cpuCount)
                 pool.map(import_NGS_train, files)
@@ -342,7 +346,10 @@ if type == "methatlas":
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain Infinium HM450K files (tab separated with cg and beta value)... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files ending in *txt?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
 
                 pool = Pool(cpuCount)
@@ -373,7 +380,10 @@ if type == "methatlas":
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain Infinium HumanMethylationEPIC files (tab separated with cg and beta value)... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files ending in *txt?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
 
                 pool = Pool(cpuCount)
@@ -412,7 +422,10 @@ elif (type == "celfie" or type == "celfie_individ_cpg"):
                     tumorGroup_list.append(df)
                 
                 print("Running on %s which should contain bismark coverage files... " % folder) 
-                print("Found files! %s " % files) 
+                if len(files) == 0:
+                    sys.exit("ERROR! No files found (are the files gzipped and ending in *cov.gz?)")
+                else:
+                    print("Found files! %s " % files) 
                 print("Labeling these files as %s" % labels)
 
                 pool = Pool(cpuCount)

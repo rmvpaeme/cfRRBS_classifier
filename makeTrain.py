@@ -58,8 +58,10 @@ parser.add_argument('-d', '--epiclabels', help = "comma-separated list of labels
 parser.add_argument('-r', '--regions', required = True, default = None, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID")
 parser.add_argument('-c', '--cutoff', default = 30, help = "all clusters with reads below this threshold will be marked as NA.")
 
-parser.add_argument('-y', '--infiannot', help = "annotation file of HM450K in csv.gz format, see Illuina website.", default = dirname + "/classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
-parser.add_argument('-z', '--epicannot', help = "annotation file of MethylationEPIC in csv.gz format, see Illumina website.", default = dirname + "/classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
+parser.add_argument('-y', '--infiannot', help = "annotation file of HM450K in csv.gz format, see README and Illuina website.", default = dirname + "/classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz")
+parser.add_argument('-z', '--epicannot', help = "annotation file of MethylationEPIC in csv.gz format, see README and Illumina website.", default = dirname + "/classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz")
+
+parser.add_argument('--annotbuild', choices = ['hg19', 'hg38'], help = "Reference genome for the HM450K/EPIC annotation files.", default = "hg19")
 
 parser.add_argument('-t', '--type', choices=['celfie', "celfie_individ_cpg", 'methatlas'], required = True, help = "Make reference for celfie or meth_atlas (=NNLS). Celfie only supports bismark coverage files. Default = 'methatlas'.", default = "methatlas")
 
@@ -78,6 +80,8 @@ epiclabels = args.epiclabels
 regions = args.regions
 infiannot = args.infiannot
 epicannot = args.epicannot
+
+annotbuild = str(args.annotbuild)
 
 cutoff = int(args.cutoff)
 
@@ -329,7 +333,7 @@ if type == "methatlas":
                     ## Add the chromosomal position to the sample
                     df = pd.merge(array450k, df, how = "inner", left_index=True, right_index=True)
                     ## Add a stop and reorder the columns
-                    df["MAPINFO_Stop"] = df["MAPINFO"]
+                    df["MAPINFO_Stop"] = (df["MAPINFO"].astype(int) + 2).astype(str) # MAPINFO is 0-based, this conforms to bed format
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
                     df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w')
@@ -360,7 +364,7 @@ if type == "methatlas":
                     ## Add the chromosomal position to the sample
                     df = pd.merge(array850k, df, how = "inner", left_index=True, right_index=True)
                     ## Add a stop and reorder the columns
-                    df["MAPINFO_Stop"] = df["MAPINFO"]
+                    df["MAPINFO_Stop"] = (df["MAPINFO"].astype(int) + 2).astype(str)# MAPINFO is 0-based, this conforms to bed format
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
                     df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w')

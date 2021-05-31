@@ -30,7 +30,7 @@ conda install -c bioconda bedtools
 mkdir -p ./classifySamples/resources && cp RRBS_450k_intersectClusters.tsv ./classifySamples/resources 
 ```
 
-Furthermore, you need the Infinium HM450K and methylationEPIC annotation files if you are going to use these datatypes in the reference dataset. 
+Furthermore, you need the Infinium HM450K and methylationEPIC annotation files if you are going to use these datatypes in the reference dataset.
 
 ```
 # these are in hg19
@@ -39,6 +39,15 @@ mkdir -p ./classifySamples/resources
 wget -qO - ftp://webdata2:webdata2@ussd-ftp.illumina.com/downloads/ProductFiles/HumanMethylation450/HumanMethylation450_15017482_v1-2.csv | gzip -c > HumanMethylation450_15017482_v1-2.csv.gz && mv HumanMethylation450_15017482_v1-2.csv.gz ./classifySamples/resources
 
 wget -q -O tmp.zip https://webdata.illumina.com/downloads/productfiles/methylationEPIC/infinium-methylationepic-v-1-0-b4-manifest-file-csv.zip && unzip tmp.zip && rm tmp.zip && gzip MethylationEPIC_v-1-0_B4.csv && mv MethylationEPIC_v-1-0_B4.csv.gz ./classifySamples/resources
+
+# these are in GRCh38
+# if you use these annotation files, you have to add --hg38 to makeTrain.py
+
+mkdir -p ./classifySamples/resources
+
+wget http://zhouserver.research.chop.edu/InfiniumAnnotation/20180909/HM450/HM450.hg38.manifest.tsv.gz && mv HM450.hg38.manifest.tsv.gz ./classifySamples/resources
+
+wget http://zhouserver.research.chop.edu/InfiniumAnnotation/20180909/EPIC/EPIC.hg38.manifest.tsv.gz && mv EPIC.hg38.manifest.tsv.gz ./classifySamples/resources
 ```
 ## Quick start
 ```
@@ -59,3 +68,6 @@ python runMeth_atlas.py -a ./classifySamples/resources/20190323_test_beta_plasma
                         -n normal,wbc \
                         -p examplerun
 ```
+
+# Changelog
+- 2020-05-31: added array annotation GRCh38, made the Illumina annotation files 0-based.

@@ -45,7 +45,8 @@ Generating the reference dataset (makeTrain.py) takes Bismark coverage files and
 
 ```bash
 for file in *txt; do
-cut -f x,y ${file} > ${file}_cut.txt
+# remove the tail -n+2 step if the files are already headerless
+tail -n+2 ${file} | cut -f x,y  > ${file}_cut.txt
 done
 ```
 

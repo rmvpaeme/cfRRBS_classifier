@@ -41,7 +41,7 @@ wget -qO - ftp://webdata2:webdata2@ussd-ftp.illumina.com/downloads/ProductFiles/
 wget -q -O tmp.zip https://webdata.illumina.com/downloads/productfiles/methylationEPIC/infinium-methylationepic-v-1-0-b4-manifest-file-csv.zip && unzip tmp.zip && rm tmp.zip && gzip MethylationEPIC_v-1-0_B4.csv && mv MethylationEPIC_v-1-0_B4.csv.gz ./classifySamples/resources
 
 # these are in GRCh38
-# if you use these annotation files, you have to add --hg38 to makeTrain.py
+# if you use these annotation files, you have to add --hg38 to makeTrain.py and specify their locations with --infiannot and --epicannot
 
 mkdir -p ./classifySamples/resources
 

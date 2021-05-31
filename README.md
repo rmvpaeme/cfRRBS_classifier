@@ -40,6 +40,18 @@ wget -qO - ftp://webdata2:webdata2@ussd-ftp.illumina.com/downloads/ProductFiles/
 
 wget -q -O tmp.zip https://webdata.illumina.com/downloads/productfiles/methylationEPIC/infinium-methylationepic-v-1-0-b4-manifest-file-csv.zip && unzip tmp.zip && rm tmp.zip && gzip MethylationEPIC_v-1-0_B4.csv && mv MethylationEPIC_v-1-0_B4.csv.gz ./classifySamples/resources
 ```
+
+Generating the reference dataset (makeTrain.py) takes Bismark coverage files and Infinium data as input. Bismark coverage files can be used without any modifications. If you use Infinium data, you first need to preprocess your data so that you have 1 column with cg-IDs and a second column with beta values (according to this [example](https://github.com/rmvpaeme/cfRRBS_classifier/blob/main/classifySamples/train/examples/infinium/EWS/GSM2357802.txt)). You can use a simple for loop in bash for this
+
+```bash
+for file in *txt; do
+cut -f x,y ${file} > ${file}_cut.txt
+done
+```
+
+Where `x,y` are the columns to extract.
+
+
 ## Quick start
 ```
 # make the reference dataset (only needs to happen once or after including other samples)

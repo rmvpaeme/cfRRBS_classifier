@@ -40,14 +40,13 @@ wget -qO - ftp://webdata2:webdata2@ussd-ftp.illumina.com/downloads/ProductFiles/
 
 wget -q -O tmp.zip https://webdata.illumina.com/downloads/productfiles/methylationEPIC/infinium-methylationepic-v-1-0-b4-manifest-file-csv.zip && unzip tmp.zip && rm tmp.zip && gzip MethylationEPIC_v-1-0_B4.csv && mv MethylationEPIC_v-1-0_B4.csv.gz ./classifySamples/resources
 
-# these are in GRCh38
+# annotation files in GRCh38 are available at ./classifySamples/resources
 # if you use these annotation files, you have to add --hg38 to makeTrain.py and specify their locations with --infiannot and --epicannot
+# you can also download them directly from http://zhouserver.research.chop.edu/InfiniumAnnotation/
 
-mkdir -p ./classifySamples/resources
+wget http://zhouserver.research.chop.edu/InfiniumAnnotation/20180909/HM450/HM450.hg38.manifest.tsv.gz
 
-wget http://zhouserver.research.chop.edu/InfiniumAnnotation/20180909/HM450/HM450.hg38.manifest.tsv.gz && mv HM450.hg38.manifest.tsv.gz ./classifySamples/resources
-
-wget http://zhouserver.research.chop.edu/InfiniumAnnotation/20180909/EPIC/EPIC.hg38.manifest.tsv.gz && mv EPIC.hg38.manifest.tsv.gz ./classifySamples/resources
+wget http://zhouserver.research.chop.edu/InfiniumAnnotation/20180909/EPIC/EPIC.hg38.manifest.tsv.gz 
 ```
 
 Generating the reference dataset (makeTrain.py) takes Bismark coverage files and Infinium data as input. Bismark coverage files can be used without any modifications. If you use Infinium data, you first need to preprocess your data so that you have 1 column with cg-IDs and a second column with beta values (according to this [example](https://github.com/rmvpaeme/cfRRBS_classifier/blob/main/classifySamples/train/examples/infinium/EWS/GSM2357802.txt)). You can use a simple for loop in bash for this

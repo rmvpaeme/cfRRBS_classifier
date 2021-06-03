@@ -5,7 +5,7 @@ This repository contains the scripts to perform deconvolution on cf-RRBS data.
     - meth_atlas: `makeTest.py -h`
     - CelFIE: see snakemake pipeline at https://github.com/rmvpaeme/celfie/blob/master/celfiePipeline.snakefile
 1. Perform the deconvolution and obtain results for further downstream processing.
-    - meth_atlas: `runMeth_atlas.py -h`
+    - [meth_atlas by nloyfer](https://github.com/nloyfer/meth_atlas): `runMeth_atlas.py -h`
     - CelFIE: see snakemake pipeline at https://github.com/rmvpaeme/celfie/blob/master/celfiePipeline.snakefile
 
 # Installation

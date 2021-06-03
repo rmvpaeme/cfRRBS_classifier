@@ -1,5 +1,5 @@
 # Summary
-This repository contains the scripts to perform deconvolution on cf-RRBS data. 
+This repository contains the scripts to perform deconvolution on cf-RRBS data with NNLS (wrapper provided by @nloyfer) or CeLFIE (algorithm by @christacaggiano). 
 1. Create a reference dataset compatible with the algorithm = `makeTrain.py -h`, supports both creation of the reference dataset for [meth_atlas](https://github.com/nloyfer/meth_atlas) (`makeTrain.py --t meth_atlas`) and [CelFIE](https://github.com/rmvpaeme/celfie/blob/master/celfiePipeline.snakefile) (`makeTrain.py --t celfie`).
 1. Create a matrix containing the samples on which deconvolution will be performed.
     - meth_atlas: `makeTest.py -h`

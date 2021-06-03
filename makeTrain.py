@@ -24,15 +24,17 @@ tmp_folder = os.path.join(tempdir.name)
 # testargs
 #ngsfolder = ["/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA"]
 #ngslabels = ["NBL","cfDNA"]
-
-#infiniumfolder= ["/Users/rmvpaeme/Repos/cfRRBS_classifier_v0.2/classifySamples/train/infinium/EWS/","/Users/rmvpaeme/Repos/cfRRBS_classifier_v0.2/classifySamples/train/infinium/EWS2/"]
+#ngslabels = ["filename"]
+#infiniumfolder= ["/Users/rmvpaeme/Repos/cfRRBS_classifier_v0.5/classifySamples/train/examples/infinium/EWS","/Users/rmvpaeme/Repos/cfRRBS_classifier_v0.5/classifySamples/train/examples/infinium/EWS2/"]
 #infiniumlabels=["EWS","EWS2"]
 
 #regions = "./classifySamples/resources/RRBS_450k_intersectClusters.tsv"
 #infiannot = "./classifySamples/resources/HumanMethylation450_15017482_v1-2.csv.gz"
 #epicannot = "./classifySamples/resources/MethylationEPIC_v-1-0_B4.csv.gz"
+#annotbuild = "hg19"
 #output = "./testscript.tsv"
-#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA  -i /Users/rmvpaeme/Repos/cfRRBS_classifier_v0.2/classifySamples/train/infinium/EWS/ -b EWS -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test -t methatlas
+#python MakeTrain.py -n /Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/NBL/","/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA -a NBL,cfDNA  -i /Users/rmvpaeme/Repos/cfRRBS_classifier_v0.5/classifySamples/train/examples/infinium/EWS -b EWS -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv -o test -t methatlas
+
 #%%
 
 parser = argparse.ArgumentParser(
@@ -48,13 +50,13 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('-n', '--ngsfolder', help = "comma-separated list of location of the folder that contains bismark coverage files in cov.gz format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All cov.gz files in this folder will be added to the reference dataset.", 
                     default = None, action=SplitArgs)
-parser.add_argument('-a', '--ngslabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
+parser.add_argument('-a', '--ngslabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2). If '--ngslabel filename', the filenames are used instead of custom labels.'", default = None, action=SplitArgs)
 
 parser.add_argument('-i', '--infiniumfolder', help = "comma-separated list of location of the folder that contains HM450K files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be headerless, tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
-parser.add_argument('-b', '--infiniumlabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
+parser.add_argument('-b', '--infiniumlabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2). If '--infiniumlabels filename', the filenames are used instead of custom labels.", default = None, action=SplitArgs)
 
 parser.add_argument('-e', '--epicfolder', help = "comma-separated list of location of the folder that contains MethylationEPIC files in .txt format (e.g. /path/to/folder/tumor1,/path/to/folder/tumor2). All .txt files in this folder will be added to the reference dataset. The files should be headerless, tab-separated and contain the cg-identifiers in the first column and the beta-values in the second column.", default = None, action=SplitArgs)
-parser.add_argument('-d', '--epiclabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2)", default = None, action=SplitArgs)
+parser.add_argument('-d', '--epiclabels', help = "comma-separated list of labels corresponding to the folders (e.g. tumor1,tumor2). If '--epiclabels filename', the filenames are used instead of custom labels.", default = None, action=SplitArgs)
 
 parser.add_argument('-r', '--regions', required = True, default = None, help = "tab-separated file contain the regions of interest, containing 4 columns with chrom\tstart\tstop\tclusterID")
 parser.add_argument('-c', '--cutoff', default = 30, help = "all clusters with reads below this threshold will be marked as NA.")
@@ -71,12 +73,24 @@ args = parser.parse_args()
 
 ngsfolder = args.ngsfolder
 ngslabels = args.ngslabels
+if ngsfolder is not None:
+    if len(ngsfolder) != len(ngslabels) and ''.join(ngslabels) != "filename":
+        sys.exit("ERROR! Length of ngslabels not equal to length of ngsfolders.")
+
 
 infiniumfolder = args.infiniumfolder
 infiniumlabels = args.infiniumlabels
 
+if infiniumfolder is not None:
+    if len(infiniumfolder) != len(infiniumlabels) and ''.join(infiniumlabels) != "filename":
+        sys.exit("ERROR! Length of infiniumlabels not equal to length of infiniumfolders.")
+
 epicfolder = args.epicfolder
 epiclabels = args.epiclabels
+
+if epicfolder is not None:
+    if len(epicfolder) != len(epiclabels) and ''.join(epiclabels) != "filename":
+        sys.exit("ERROR! Length of epiclabels not equal to length of epicfolder.")
 
 regions = args.regions
 infiannot = args.infiannot
@@ -302,14 +316,21 @@ if type == "methatlas":
         if ngsfolder is not None:
             ngsindex = 0
             for folder in ngsfolder:
-                files = glob.glob(os.path.join(str(folder), "*.gz"))  
-                labels = ngslabels[ngsindex]
+                files = glob.glob(os.path.join(str(folder), "*.gz"))
+                if ''.join(ngslabels) == "filename":
+                    ngslabels = ngslabels*len(files)
+                    labels = ngslabels[ngsindex]
+                else:
+                    labels = ngslabels[ngsindex]
 
                 def import_NGS_train(x):
                     file = x
                     #file = '/Users/rmvpaeme/Repos/2003_CelFiE/NBL_reference_set/cfDNA/DNA050873_S4_R1_001_val_1_bismark_bt2_pe.bismark.cov.gz'
                     file_name = os.path.splitext(os.path.basename(file))[0]
-                    df = generateTrain_NGS(inputfile = file, label = labels, file_name = file_name)
+                    if labels == "filename":
+                        df = generateTrain_NGS(inputfile = file, label = file_name, file_name = file_name)
+                    else:
+                        df = generateTrain_NGS(inputfile = file, label = labels, file_name = file_name)                       
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain bismark coverage files... " % folder) 
@@ -327,7 +348,11 @@ if type == "methatlas":
             infiniumindex = 0 
             for folder in infiniumfolder:
                 files = glob.glob(os.path.join(str(folder), "*.txt"))  
-                labels = infiniumlabels[infiniumindex]
+                if ''.join(infiniumlabels) == "filename":
+                    infiniumlabels = infiniumlabels*len(files)
+                    labels = infiniumlabels[infiniumindex]
+                else:
+                    labels = infiniumlabels[infiniumindex]               
 
                 def import_HM450K_train(x):
                     file = x
@@ -341,8 +366,10 @@ if type == "methatlas":
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
                     df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w', na_rep='NA')
-
-                    df = generateTrain_Infinium(label = labels, file_name = file_name)
+                    if labels == "filename":
+                        df = generateTrain_Infinium(label = file_name, file_name = file_name)
+                    else:
+                        df = generateTrain_Infinium(label = labels, file_name = file_name)                       
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain Infinium HM450K files (tab separated with cg and beta value)... " % folder) 
@@ -360,8 +387,13 @@ if type == "methatlas":
         if epicfolder is not None:
             epicindex = 0
             for folder in epicfolder:
-                files = glob.glob(os.path.join(str(folder), "*.txt"))  
-                labels = epiclabels[epicindex]
+                files = glob.glob(os.path.join(str(folder), "*.txt"))
+                if ''.join(epiclabels) == "filename":
+                    epiclabels = epiclabels*len(files)
+                    labels = epiclabels[epicindex]
+                else:
+                    labels = epiclabels[epicindex]    
+                
 
                 def import_epic_train(x):
                     file = x
@@ -375,8 +407,10 @@ if type == "methatlas":
                     df = df[["CHR", "MAPINFO", "MAPINFO_Stop", "Beta_Value"]]
                     df.sort_values(by = ["CHR", "MAPINFO"], inplace=True)
                     df.to_csv(tmp_folder + "%s.txt" % file_name , header=None, index=None, sep='\t', mode = 'w', na_rep='NA')
-
-                    df = generateTrain_Infinium(label = labels, file_name = file_name)
+                    if labels == "filename":
+                        df = generateTrain_Infinium(label = file_name, file_name = file_name)
+                    else:
+                        df = generateTrain_Infinium(label = labels, file_name = file_name)
                     trainFile_list.append(df)
 
                 print("Running on %s which should contain Infinium HumanMethylationEPIC files (tab separated with cg and beta value)... " % folder) 

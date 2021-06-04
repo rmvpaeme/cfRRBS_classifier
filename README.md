@@ -197,4 +197,5 @@ optional arguments:
 ```
 
 # Changelog
+- 2020-06-03: added "filename" argument for --labels.
 - 2020-05-31: added array annotation GRCh38, made the Illumina annotation files 0-based.

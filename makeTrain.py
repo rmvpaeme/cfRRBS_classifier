@@ -83,7 +83,7 @@ infiniumlabels = args.infiniumlabels
 
 if infiniumfolder is not None:
     if len(infiniumfolder) != len(infiniumlabels) and ''.join(infiniumlabels) != "filename":
-        sys.exit("ERROR! Length of infiniumlabels not equal to length of infiniumfolders.")
+        sys.exit("ERROR! Length of infiniumlabels not equal to length of infiniumfolder.")
 
 epicfolder = args.epicfolder
 epiclabels = args.epiclabels

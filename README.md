@@ -7,7 +7,10 @@ This repository contains the scripts to perform deconvolution on cf-RRBS data wi
 1. Perform the deconvolution and obtain results for further downstream processing.
     - [meth_atlas by nloyfer](https://github.com/nloyfer/meth_atlas): `runMeth_atlas.py -h`
     - CelFIE: see snakemake pipeline at https://github.com/rmvpaeme/celfie/blob/master/celfiePipeline.snakefile
-
+1. (optional) By specifying the number of iterations in `runMeth_atlas.py` a confidence around the final tumor call can be obtained. 
+    - If the number of iterations = 1 (default), replicates in the reference dataset (e.g. 20x normal tissue, 30x tumor tissue) are collapsed into 1 column for each tissue type and the mean/median is used for further deconvolution.
+    - If the number of iterations > 1, a beta distribution is fitted for every CpG/region. Replicates in the reference dataset are collapsed by random sampling from this beta distribution, so the reference dataset is slightly different in every itation. 
+    
 # Installation
 ## Dependencies
 
@@ -219,6 +222,9 @@ optional arguments:
 If `runMeth_atlas.py` is run with more than 1 iteration (e.g. `--iter 50`), a new reference is made in every iteration by sampling from the beta distribution for every CpG/region.
 
 The results can be visualised with `plot_error.R`. Example figures are available in `./classifySamples/output/plots/examples/`
+
+- `countplot.png` shows the majority vote in every iteration (so the tumor class that is the highest in every iteration).
+- `errorplot.png` shows the mean +/- SD.
 
 ```
 Usage: plot_error.R [options]

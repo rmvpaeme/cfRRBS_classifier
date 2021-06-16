@@ -100,6 +100,6 @@ classificationResults_plasma$SampleID <- gsub("snake", "", classificationResults
 p2 <- ggplot(classificationResults_plasma, aes(x = SampleID, y = tumorFx*100, col = ClassificationResult)) +
   geom_point(position = myjit) + theme_bw() +    geom_errorbar(aes(ymin=tumorFx*100-sd*100, ymax=tumorFx*100+sd*100), width=.1, position=myjit) +
   theme(panel.grid.major.y=element_line(linetype = "dashed",color="gray88"), axis.text.y=element_text(size=8)) + 
-  labs(y = "Estimated TFx (%)", x = "SampleID", col = "Classification call") + coord_flip()
+  labs(y = "Estimated TFx (%) (mean +/- SD)", x = "SampleID", col = "Classification call") + coord_flip()
 ggsave(paste0(opt$outdir, "/", format(Sys.time(),'%Y%m%d_%H%M%S_'), "errorplot.png"), p2)
 write_tsv(classificationResults_plasma, paste0(opt$outdir, "/", format(Sys.time(),'%Y%m%d_%H%M%S_'), "aggregated_results.tsv"))

@@ -19,6 +19,15 @@ scipy==1.6.3
 multiprocess==0.70.11.1
 bedtools==2.30.0
 ```
+
+For R, tested with
+```
+Rmisc_1.5
+tidyverse_1.3.1
+reshape2_1.4.4
+data.table_1.14.0
+optparse_1.6.6 
+```
 ## Installation with Conda
 
 ```bash
@@ -32,6 +41,8 @@ mkdir -p ./classifySamples/resources && cp RRBS_450k_intersectClusters.tsv ./cla
 ```
 
 Furthermore, you need the Infinium HM450K and methylationEPIC annotation files if you are going to use these datatypes in the reference dataset.
+
+This does not install the R dependencies.
 
 ```bash
 # these are in hg19
@@ -80,11 +91,14 @@ python runMeth_atlas.py -a ./classifySamples/resources/20190323_test_beta_plasma
                         -b ./classifySamples/resources/train_plasma_WGBS_as_normal_MANUSCRIPT.gz \
                         -n normal,wbc \
                         -p examplerun
+
+# if deconvolution is run with more than 1 iteration (e.g. --iter 50)
+Rscript plot_error.R -n normal,wbc 
 ```
 
 ## Features
 ### makeTrain.py
-```bash
+```
 python makeTrain.py -h
 usage:
     MakeTrain.py
@@ -136,7 +150,7 @@ optional arguments:
 
 ### makeTest.py
 
-```bash
+```
 python makeTest.py -h
 usage:
     MakeTest.py
@@ -166,18 +180,21 @@ optional arguments:
 
 ### runMeth_atlas.py
 
-```bash
+```
 python runMeth_atlas.py -h
-usage:
+usage: 
     runMeth_atlas.py
 
     Runs metatlas on a testmatrix and reference matrix.
     Files will be written to ./classifySamples/output/classification
 
+    With the default parameters (iterations = 1), the replicates are collapsed with mean/median (depending on the -c parameter).
+    If iterations are > 1, a beta distribution is calculated from every CpG/region, and in every iteration the methylation (beta) values are random samples from this beta distribution, which gives an uncertainty around the tumor classification call (plot_error.R). 
+
     Example:
     runMeth_atlas.py -a /folder/test -b /folder/ref -p outprefix -n cfDNA,WBC
-
-       [-h] -a TEST -b REFERENCE [-n NORMAL] [-x EXCLUDE] [-c {mean,median}] -p OUTPREFIX [-f] [-m MRC]
+    
+       [-h] -a TEST -b REFERENCE [-n NORMAL] [-x EXCLUDE] [-c {mean,median}] -p OUTPREFIX [-f] [-m MRC] [-i ITER]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -194,8 +211,33 @@ optional arguments:
                         prefix for output files (default: None)
   -f, --fs              enable feature selection by selecting the top n hyper and hypomethylated regions per entity (default: False)
   -m MRC, --mrc MRC     top n hyper and hypomethylated regions will be selected with feature selection (default: 100)
+  -i ITER, --iter ITER  number of iterations (every iteration samples random from the beta distribution for every CpG) (default: 1)
 ```
 
+### plot_error.R
+
+If `runMeth_atlas.py` is run with more than 1 iteration (e.g. `--iter 50`), a new reference is made in every iteration by sampling from the beta distribution for every CpG/region.
+
+The results can be visualised with `plot_error.R`. Example figures are available in `./classifySamples/output/plots/examples/`
+
+```
+Usage: plot_error.R [options]
+
+
+Options:
+        -d CHARACTER, --directory=CHARACTER
+                directory for *deconv_output.csv files
+
+        -o CHARACTER, --outdir=CHARACTER
+                output directory for figures [default= ./classifySamples/output/plots/]
+
+        -n CHARACTER, --normal=CHARACTER
+                comma-separated list of labels of the normal tissues in the reference dataset to exclude from tumor assignment e.g. cfdna,wbc
+
+        -h, --help
+                Show this help message and exit
+```
 # Changelog
-- 2020-06-03: added "filename" argument for --labels.
-- 2020-05-31: added array annotation GRCh38, made the Illumina annotation files 0-based.
+- 2021-06-16: added iterations
+- 2021-06-03: added "filename" argument for --labels.
+- 2021-05-31: added array annotation GRCh38, made the Illumina annotation files 0-based.

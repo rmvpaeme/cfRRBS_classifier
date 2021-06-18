@@ -23,7 +23,7 @@ multiprocess==0.70.11.1
 bedtools==2.30.0
 ```
 
-For R, tested with
+For R, tested with 4.1.0 and the following packages:
 ```
 Rmisc_1.5
 tidyverse_1.3.1
@@ -45,7 +45,7 @@ mkdir -p ./classifySamples/resources && cp RRBS_450k_intersectClusters.tsv ./cla
 
 Furthermore, you need the Infinium HM450K and methylationEPIC annotation files if you are going to use these datatypes in the reference dataset.
 
-This does not install the R dependencies.
+**This does not install the R dependencies.**
 
 ```bash
 # these are in hg19

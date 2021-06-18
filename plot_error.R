@@ -20,6 +20,8 @@ option_list = list(
 opt_parser = OptionParser(option_list=option_list)
 opt = parse_args(opt_parser)
 
+ifelse(!dir.exists(opt$outdir), dir.create(opt$outdir), FALSE)
+
 if (is.null(opt$directory)){
   print_help(opt_parser)
   stop("At least one argument must be supplied (input file).n", call.=FALSE)
@@ -62,7 +64,7 @@ for(i in 1:length(files)){
 # Find what the predicted tumor is within each iteration and plot that
 classFreq <- data_list
 classFreq <- lapply(classFreq, melt)
-classFreq <- classFreq %>% lapply(. %>% filter((V1 != "normal")) %>% filter((V1 != "wbc") ))
+classFreq <- classFreq %>% lapply(. %>% filter((!V1 %in% c(normal))))
 grouped <- classFreq %>% lapply(. %>% dplyr::group_by(variable) %>%
                                   filter(value == max(value))  %>%
                                   arrange(variable, V1)) #%>% dplyr::summarise(value = max(value)))

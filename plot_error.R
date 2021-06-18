@@ -63,7 +63,7 @@ for(i in 1:length(files)){
 
 # Find what the predicted tumor is within each iteration and plot that
 classFreq <- data_list
-classFreq <- lapply(classFreq, melt)
+classFreq <- lapply(classFreq, reshape2::melt)
 classFreq <- classFreq %>% lapply(. %>% filter((!V1 %in% c(normal))))
 grouped <- classFreq %>% lapply(. %>% dplyr::group_by(variable) %>%
                                   filter(value == max(value))  %>%
@@ -84,7 +84,7 @@ colnames(classificationResults_plasma) <- c("ClassificationResult", "SampleID", 
 
 # Calculate tumor percentage with SD. 
 full_results = do.call(rbind, data_list)
-full_results <- full_results %>% melt()
+full_results <- full_results %>% reshape2::melt()
 
 tgc <- summarySE(full_results, measurevar="value", groupvars=c("V1", "variable")) %>% filter((!V1 %in% c(normal)))
 

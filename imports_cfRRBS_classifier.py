@@ -5,7 +5,10 @@ import os
 
 def import_clusters(regions, tempdir, type = "methatlas"):
     # The file containing the features (= the intersect between HM450K data and RRBS data, see GitHub README)
-    clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2], skiprows=[0], header=None, index_col=None)
+    if (type == "methatlas"):
+        clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2], skiprows=[0], header=None, index_col=None)
+    elif (type == "cancerdetector"):
+        clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2,3], skiprows=[0], header=None, index_col=3)        
     clusters = clusters[clusters[0] != "chrY"]
     clusters = clusters[clusters[0] != "chrX"]
     clusters = clusters[clusters[0] != "Y"]

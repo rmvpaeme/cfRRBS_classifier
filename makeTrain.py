@@ -66,7 +66,7 @@ parser.add_argument('-z', '--epicannot', help = "annotation file of MethylationE
 
 parser.add_argument('--annotbuild', choices = ['hg19', 'hg38'], help = "Reference genome for the HM450K/EPIC annotation files.", default = "hg19")
 
-parser.add_argument('-t', '--type', choices=['celfie', "celfie_individ_cpg", 'methatlas'], required = True, help = "Make reference for celfie or meth_atlas (=NNLS). Celfie only supports bismark coverage files. Default = 'methatlas'.", default = "methatlas")
+parser.add_argument('-t', '--type', choices=['celfie', "celfie_individ_cpg", 'methatlas', 'cancerdetector'], required = True, help = "Make reference for celfie or meth_atlas (=NNLS). Celfie only supports bismark coverage files. Default = 'methatlas'.", default = "methatlas")
 
 parser.add_argument('-o', '--output', required = True, help = "the reference matrix will be saved as this file in ./classifySamples/output/", default = None)
 args = parser.parse_args()
@@ -308,7 +308,7 @@ def generateTrain_celfie(inputfile, label, file_name):
 
         return df
 #%%
-if type == "methatlas":
+if (type == "methatlas" or type == "cancerdetector"):
     with Manager() as manager:
         #Define empty list
         trainFile_list = manager.list()
@@ -430,7 +430,11 @@ if type == "methatlas":
         # Make sure that the file contains all the clusters
         trainFile = pd.merge(clusters, trainFile, how = "left", left_index=True, right_index=True)
         trainFile = trainFile.transpose().fillna('NA')
-        trainFile.to_csv(trainFileName + ".tsv.gz", header=None, sep='\t', mode = 'w', compression = "gzip")
+        clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2,3], skiprows=[0], header=None, index_col=3)   
+        if (type == "methatlas"):
+            trainFile.to_csv(trainFileName + ".tsv.gz", header=None, sep='\t', mode = 'w', compression = "gzip")
+        elif (type == "cancerdetector"):      
+            trainFile.to_csv(trainFileName + "_withindex.tsv.gz", header=True, index = True, sep='\t', mode = 'w', compression = "gzip")
         trainFile_rmNA = trainFile.select_dtypes(include=['float64'])
         print("The number of rows in the %s is: %i" %  (regions,clusters.shape[0])) 
         print("The number of columns in the %s file is: %i" %  (trainFileName,trainFile.shape[1]))

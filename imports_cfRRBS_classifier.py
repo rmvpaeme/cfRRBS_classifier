@@ -5,7 +5,7 @@ import os
 
 def import_clusters(regions, tempdir, type = "methatlas"):
     # The file containing the features (= the intersect between HM450K data and RRBS data, see GitHub README)
-    if (type == "methatlas" or type == "celfie"):
+    if (type == "methatlas" or type == "celfie" or type == "coords"):
         clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2], skiprows=[0], header=None, index_col=None)
     elif (type == "cancerdetector"):
         clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2,3], skiprows=[0], header=None, index_col=3)        
@@ -19,6 +19,9 @@ def import_clusters(regions, tempdir, type = "methatlas"):
     if (type == "celfie" or type == "celfie_individ_cpg"):
         clusters = clusters.drop([3], axis = 1)
         clusters.columns = ["CHROM", "START", "END"] # Use empty index to later extract all the clusters from, so that every sample has the same number of clusters
+    if (type == "coords"):
+        clusters = clusters.drop([3], axis = 1)
+        clusters.columns = ["chrom", "start", "end"]
     else:
         clusters = clusters.drop([0,1,2,3], axis = 1) # Use empty index to later extract all the clusters from, so that every sample has the same number of clusters
     return clusters,str(clusterFile)

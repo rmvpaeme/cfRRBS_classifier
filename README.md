@@ -244,6 +244,7 @@ Options:
                 Show this help message and exit
 ```
 # Changelog
+- 2021-07-16: outputs by default in chr-start-stop format in addition to other files
 - 2021-06-16: added iterations
 - 2021-06-03: added "filename" argument for --labels.
 - 2021-05-31: added array annotation GRCh38, made the Illumina annotation files 0-based.

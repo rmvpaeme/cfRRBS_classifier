@@ -130,6 +130,7 @@ print("""Running makeTrain.py for %s
             trainFileName, tmp_folder))
 #%%
 clusters = cfRRBS.import_clusters(regions, tmp_folder, type = type)[0]
+clustercoords = cfRRBS.import_clusters(regions, tmp_folder, type = "coords")[0]
 clusterFile = cfRRBS.import_clusters(regions, tmp_folder, type = type)[1]
 if infiniumfolder is not None:  
     array450k = cfRRBS.import_450k(infiannot, annotbuild)
@@ -430,9 +431,13 @@ if (type == "methatlas" or type == "cancerdetector"):
         # Make sure that the file contains all the clusters
         trainFile = pd.merge(clusters, trainFile, how = "left", left_index=True, right_index=True)
         trainFile = trainFile.transpose().fillna('NA')
-        clusters = pd.read_csv(regions, sep="\t",usecols=[0,1,2,3], skiprows=[0], header=None, index_col=3)   
+        trainFile_coords = pd.concat(trainFile_list, axis = 1)
+        trainFile_coords = pd.merge(clustercoords, trainFile_coords, how = "left", left_index=True, right_index=True)
+        trainFile_coords = trainFile_coords.fillna('NA')
+        clusters = pd.read_csv(regions, sep="\t",usecols=[0], skiprows=[0], header=None, index_col=3)   
         if (type == "methatlas"):
             trainFile.to_csv(trainFileName + ".tsv.gz", header=None, sep='\t', mode = 'w', compression = "gzip")
+            trainFile_coords.to_csv(trainFileName + "_coords.txt.gz", header=True, index = False, sep='\t', mode = 'w', compression = "gzip")
         elif (type == "cancerdetector"):      
             trainFile.to_csv(trainFileName + "_withindex.tsv.gz", header=True, index = True, sep='\t', mode = 'w', compression = "gzip")
         trainFile_rmNA = trainFile.select_dtypes(include=['float64'])

@@ -79,7 +79,7 @@ Where `x,y` are the columns to extract.
 ## Quick start
 ```bash
 # make the reference dataset (only needs to happen once or after including other samples)
-$ python makeTrain.py -n ./classifySamples/train/examples/NGS/NBL/,./classifySamples/train/examples/NGS/cfDNA \
+$ python makeTrain.py -n ./classifySamples/train/examples/NGS_GRCh37/NBL/,./classifySamples/train/examples/NGS_GRCh37/cfDNA \
                     -a NBL,cfDNA \
                     -r ./classifySamples/resources/RRBS_450k_intersectClusters.tsv \
                     -o test.txt -t methatlas

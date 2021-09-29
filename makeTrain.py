@@ -434,7 +434,7 @@ if (type == "methatlas" or type == "cancerdetector"):
         trainFile_coords = pd.concat(trainFile_list, axis = 1)
         trainFile_coords = pd.merge(clustercoords, trainFile_coords, how = "left", left_index=True, right_index=True)
         trainFile_coords = trainFile_coords.fillna('NA')
-        clusters = pd.read_csv(regions, sep="\t",usecols=[0], skiprows=[0], header=None, index_col=3)   
+        #clusters = pd.read_csv(regions, sep="\t",usecols=[0], skiprows=[0], header=None, index_col=3)   
         if (type == "methatlas"):
             trainFile.to_csv(trainFileName + ".tsv.gz", header=None, sep='\t', mode = 'w', compression = "gzip")
             trainFile_coords.to_csv(trainFileName + "_coords.txt.gz", header=True, index = False, sep='\t', mode = 'w', compression = "gzip")
